@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+git_url="$(git config --get remote.origin.url)" || true
+if [[ "${git_url}" == "https://github.com/gregorydulin/cds-wrap.git" ]]; then
+    git_branch="$(git rev-parse --abbrev-ref HEAD)"
+    if [[ "${git_branch}" == "HEAD" ]]; then
+        git_branch=""
+    fi
+else
+    git_branch=""
+fi
+
+python3 -m venv ./cds-wrap-venv
+source ./cds-wrap-venv/bin/activate
+    pip install --upgrade pip
+    pip install --upgrade wheel
+    pip install --upgrade "git+https://github.com/gregorydulin/cds-wrap.git@${git_branch}"
+deactivate

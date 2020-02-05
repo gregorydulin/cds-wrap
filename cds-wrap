@@ -8,6 +8,7 @@ __version__ = "0.1.0"
 __license__ = "MIT"
 
 import argparse
+import tarfile
 from logzero import logger
 
 
@@ -16,19 +17,30 @@ def main(args):
     logger.info("hello world")
     logger.info(args)
 
+    cds_package_tar = tarfile.open(
+        name = './cds-package.tar',
+        mode = 'a',
+    )
+
+    for path in args.paths:
+        logger.debug("Adding " + path)
+        cds_package_tar.add(path)
+
+    logger.debug("Closing tar file")
+    cds_package_tar.close()
 
 if __name__ == "__main__":
     """ This is executed when run from the command line """
     parser = argparse.ArgumentParser()
 
-    # Required positional argument
-    parser.add_argument("arg", help="Required positional argument")
+    ## Required positional argument
+    #parser.add_argument("arg", help="Required positional argument")
 
-    # Optional argument flag which defaults to False
-    parser.add_argument("-f", "--flag", action="store_true", default=False)
+    ## Optional argument flag which defaults to False
+    #parser.add_argument("-f", "--flag", action="store_true", default=False)
 
-    # Optional argument which requires a parameter (eg. -d test)
-    parser.add_argument("-n", "--name", action="store", dest="name")
+    ## Optional argument which requires a parameter (eg. -d test)
+    #parser.add_argument("-n", "--name", action="store", dest="name")
 
     # Optional verbosity counter (eg. -v, -vv, -vvv, etc.)
     parser.add_argument(
@@ -36,13 +48,21 @@ if __name__ == "__main__":
         "--verbose",
         action="count",
         default=0,
-        help="Verbosity (-v, -vv, etc)")
+        help="Verbosity (-v, -vv, etc)"
+    )
 
     # Specify output of "--version"
     parser.add_argument(
         "--version",
         action="version",
-        version="%(prog)s (version {version})".format(version=__version__))
+        version="%(prog)s (version {version})".format(version=__version__)
+    )
 
+    parser.add_argument(
+        'paths', 
+        nargs='+', 
+        help='Path of a file or a folder of files.'
+    )
+    
     args = parser.parse_args()
     main(args)

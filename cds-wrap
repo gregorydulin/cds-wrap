@@ -9,25 +9,51 @@ __license__ = "MIT"
 
 import argparse
 import tarfile
+import quopri
 from logzero import logger
 
 
 def main(args):
     """ Main entry point of the app """
-    logger.info("hello world")
     logger.info(args)
 
+    cds_package_tar_path = './cds-package.tar'
+
     cds_package_tar = tarfile.open(
-        name = './cds-package.tar',
+        name = cds_package_tar_path,
         mode = 'a',
     )
 
+    logger.info("Adding files to tar")
     for path in args.paths:
         logger.debug("Adding " + path)
         cds_package_tar.add(path)
 
-    logger.debug("Closing tar file")
+    logger.info("Closing tar file")
     cds_package_tar.close()
+
+    logger.debug("Opening tar file for reading")
+    cds_package_tar_file = open(
+        file = cds_package_tar_path,
+        mode = 'rb',
+    )
+
+    logger.debug("Opening qp.txt file for writing")
+    cds_package_qp_file = open(
+        file = cds_package_tar_path + '.qp.txt',
+        mode = 'wb',
+    )
+
+    logger.info("Encoding tar file using quoted-printable encoding")
+    quopri.encode(
+        input = cds_package_tar_file, 
+        output = cds_package_qp_file, 
+        quotetabs = False,
+    )
+
+    logger.debug("Closing files")
+    cds_package_tar_file.close()
+    cds_package_qp_file.close()
 
 if __name__ == "__main__":
     """ This is executed when run from the command line """

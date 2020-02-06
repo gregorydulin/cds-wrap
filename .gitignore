@@ -1,3 +1,8 @@
+# cds-wrap temp files
+cds-package.tar
+cds-package.tar.qp.txt
+cds-wrap-venv/**
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

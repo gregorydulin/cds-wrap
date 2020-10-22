@@ -21,7 +21,11 @@ This will create a folder `cds-wrap-venv` in the current directory
 
 ## Create package
 ```
+# linux
 ./cds-wrap-venv/bin/cds-wrap file [file...]
+
+# windows, e.g. git bash
+./cds-wrap-venv/Scripts/cds-wrap file [file...]
 ```
 
 ## Reconstruct files from package

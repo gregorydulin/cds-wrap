@@ -1,18 +1,49 @@
 #!/usr/bin/env bash
 
-git_url="$(git config --get remote.origin.url)" || true
-if [[ "${git_url}" == "https://github.com/gregorydulin/cds-wrap.git" ]]; then
-    git_branch="$(git rev-parse --abbrev-ref HEAD)"
-    if [[ "${git_branch}" == "HEAD" ]]; then
-        git_branch=""
-    fi
+# http://redsymbol.net/articles/unofficial-bash-strict-mode/
+set -eou pipefail
+
+#set -x
+
+# https://stackoverflow.com/a/246128/2895343
+script_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+
+# make venv
+python_version="$(python --version || true)"
+if (
+  echo "${python_version}" \
+    | grep -P 'Python 3'
+); then
+  python -m venv ./cds-wrap-venv
 else
-    git_branch=""
+  python3 -m venv ./cds-wrap-venv
 fi
 
-python3 -m venv ./cds-wrap-venv
-source ./cds-wrap-venv/bin/activate
-    pip install --upgrade pip
-    pip install --upgrade wheel
-    pip install --upgrade "git+https://github.com/gregorydulin/cds-wrap.git@${git_branch}"
+venv_activated=false
+
+if [[ -d "./cds-wrap-venv/bin" ]]; then
+  source ./cds-wrap-venv/bin/activate
+  venv_activated=true
+fi
+
+if [[ -d "./cds-wrap-venv/Scripts" ]]; then
+  source ./cds-wrap-venv/Scripts/activate
+  venv_activated=true
+fi
+
+if [[ "${venv_activated}" != "true" ]]; then
+  echo ERROR:  Failed to activate venv 1>&2
+  exit 1
+fi
+
+  pip install --upgrade pip \
+    || pip install --ignore-installed --upgrade pip
+  pip install --upgrade wheel
+  # if our script is sitting in a git repo, then install cds-wrap from that repo
+  if ( git -C "${script_dir}" rev-parse ) ; then
+    pip install --upgrade "${script_dir}"
+  # else install default branch from github
+  else
+    pip install --upgrade "git+https://github.com/gregorydulin/cds-wrap.git"
+  fi
 deactivate

@@ -3,12 +3,14 @@
 Module Docstring
 """
 
-__author__ = "Your Name"
+__author__ = "Gregory M. Dulin"
 __version__ = "0.1.0"
 __license__ = "MIT"
 
 import argparse
+import datetime
 import tarfile
+import tempfile
 import quopri
 from logzero import logger
 
@@ -17,42 +19,45 @@ def main(args):
     """ Main entry point of the app """
     logger.info(args)
 
-    cds_package_tar_path = './cds-package.tar'
+    #cds_package_tar_path = './cds-package.tar'
+
+    temp_file = tempfile.NamedTemporaryFile()
 
     cds_package_tar = tarfile.open(
-        name = cds_package_tar_path,
-        mode = 'a',
+        name = temp_file.name,
+        fileobj = temp_file,
+        mode = 'w',
     )
 
     logger.info("Adding files to tar")
+    logger.debug(args.paths)
     for path in args.paths:
         logger.debug("Adding " + path)
         cds_package_tar.add(path)
 
     logger.info("Closing tar file")
     cds_package_tar.close()
-
-    logger.debug("Opening tar file for reading")
-    cds_package_tar_file = open(
-        file = cds_package_tar_path,
-        mode = 'rb',
-    )
+    temp_file.seek(0)
 
     logger.debug("Opening qp.txt file for writing")
     cds_package_qp_file = open(
-        file = cds_package_tar_path + '.qp.txt',
+        file = (
+          'cds-wrap-package_'
+          + datetime.datetime.now().strftime("%Y-%m-%dT%H%M%S")
+          + '.qp.txt'
+        ),
         mode = 'wb',
     )
 
     logger.info("Encoding tar file using quoted-printable encoding")
     quopri.encode(
-        input = cds_package_tar_file, 
-        output = cds_package_qp_file, 
+        input = temp_file,
+        output = cds_package_qp_file,
         quotetabs = False,
     )
 
     logger.debug("Closing files")
-    cds_package_tar_file.close()
+    temp_file.close()
     cds_package_qp_file.close()
 
 if __name__ == "__main__":
@@ -85,10 +90,17 @@ if __name__ == "__main__":
     )
 
     parser.add_argument(
-        'paths', 
-        nargs='+', 
+        "-u",
+        "--unwrap",
+        action="store_true",
+        default=False,
+    )
+
+    parser.add_argument(
+        'paths',
+        nargs='+',
         help='Path of a file or a folder of files.'
     )
-    
+
     args = parser.parse_args()
     main(args)

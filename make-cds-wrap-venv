@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # http://redsymbol.net/articles/unofficial-bash-strict-mode/
-set -eou pipefail
+set -eo pipefail # -u breaks python activate scripts
 
 #set -x
 

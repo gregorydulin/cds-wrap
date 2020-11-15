@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+
+# http://redsymbol.net/articles/unofficial-bash-strict-mode/
+set -eo pipefail # -u breaks python activate scripts
+
+#set -x
+
+# https://stackoverflow.com/a/246128/2895343
+script_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+
+# check for root
+if [[ "$(whoami)" != "root" ]] ; then
+  cat 1>&2 << EOF
+    Must be run as root, for example:
+      sudo install
+EOF
+  exit 1
+fi
+
+# make venv
+pushd /usr/local/share
+  "${script_dir}"/make-cds-wrap-venv
+popd
+
+# make symlink
+ln -sf /usr/local/share/cds-wrap-venv/bin/cds-wrap /usr/local/bin/cds-wrap

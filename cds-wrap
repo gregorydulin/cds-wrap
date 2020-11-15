@@ -15,12 +15,7 @@ import quopri
 from logzero import logger
 
 
-def main(args):
-    """ Main entry point of the app """
-    logger.info(args)
-
-    #cds_package_tar_path = './cds-package.tar'
-
+def wrap_files(args):
     temp_file = tempfile.NamedTemporaryFile()
 
     cds_package_tar = tarfile.open(
@@ -60,6 +55,41 @@ def main(args):
     temp_file.close()
     cds_package_qp_file.close()
 
+def unwrap_files(args):
+    for path in args.paths:
+        logger.info("Unwrapping " + path)
+
+        qp_file = open(
+            file = path,
+            mode = "r",
+        )
+
+        temp_file = tempfile.NamedTemporaryFile()
+
+        quopri.decode(
+            input = qp_file,
+            output = temp_file,
+        )
+        temp_file.seek(0)
+
+        tar_file = tarfile.open(
+            name = temp_file.name,
+            fileobj = temp_file,
+            mode = 'r'
+        )
+
+        tar_file.extractall()
+
+def main(args):
+    """ Main entry point of the app """
+    logger.info(args)
+
+    if not args.unwrap:
+        wrap_files(args)
+
+    if args.unwrap:
+        unwrap_files(args)
+
 if __name__ == "__main__":
     """ This is executed when run from the command line """
     parser = argparse.ArgumentParser()
@@ -94,6 +124,7 @@ if __name__ == "__main__":
         "--unwrap",
         action="store_true",
         default=False,
+        help="unwrap files instead of wrapping them"
     )
 
     parser.add_argument(

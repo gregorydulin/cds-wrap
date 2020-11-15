@@ -40,10 +40,12 @@ fi
     || pip install --ignore-installed --upgrade pip
   pip install --upgrade wheel
   # if our script is sitting in a git repo, then install cds-wrap from that repo
-  if ( git -C "${script_dir}" rev-parse ) ; then
-    pip install --upgrade "${script_dir}"
-  # else install default branch from github
-  else
-    pip install --upgrade "git+https://github.com/gregorydulin/cds-wrap.git"
-  fi
+  pushd "${script_dir}"
+    if ( git status ) ; then
+      pip install --upgrade "${script_dir}"
+    # else install default branch from github
+    else
+      pip install --upgrade "git+https://github.com/gregorydulin/cds-wrap.git"
+    fi
+  popd
 deactivate

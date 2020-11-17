@@ -9,6 +9,7 @@ __license__ = "MIT"
 
 import argparse
 import datetime
+import subprocess
 import tarfile
 import tempfile
 import quopri
@@ -30,7 +31,7 @@ def wrap_files(args):
         logger.debug("Adding " + path)
         cds_package_tar.add(path)
 
-    logger.info("Closing tar file")
+    logger.info("Closing tar")
     cds_package_tar.close()
     temp_file.seek(0)
 
@@ -45,10 +46,24 @@ def wrap_files(args):
     )
 
     logger.info("Encoding tar file using quoted-printable encoding")
-    quopri.encode(
-        input = temp_file,
-        output = cds_package_qp_file,
-        quotetabs = False,
+    # quopri.encode tries to be smart about line endings, which breaks binary
+    # files
+    # https://bugs.python.org/issue20121
+    #
+    # email.encoders.encode_quopri in Python 3.6 doesn't have the argument
+    # necessary to convince it to leave line endings alone (keep_eols=True or
+    # binary=True, depending on the version).
+    #
+    # we use perl's qp encoder instead, since it doesn't try to be clever
+    subprocess.run(
+        [
+            'perl',
+            '-MMIME::QuotedPrint=encode_qp',
+            '-e',
+            'print encode_qp join"",<>',
+        ],
+        stdin = temp_file,
+        stdout = cds_package_qp_file,
     )
 
     logger.debug("Closing files")

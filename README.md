@@ -19,7 +19,7 @@ well.
 
 #### Install in a venv
 Download and run bash script
-[`make-cds-wrap-venv`](https://github.com/gregorydulin/cds-wrap/blob/gmd-update-readme/make-cds-wrap-venv)
+[`make-cds-wrap-venv`](./make-cds-wrap-venv)
 
 This will create a folder `cds-wrap-venv` in the current directory
 

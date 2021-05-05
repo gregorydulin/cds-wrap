@@ -13,13 +13,21 @@ ASCII or UTF-8 will be readable.  Later, we hope to extract text from common
 files for plain-text audit.  Eventually, we'd like to perform OCR on images as
 well.
 
-## Install in a venv
+## Quick Start
+
+### Install
+
+#### Install in a venv
 Download and run bash script
 [`make-cds-wrap-venv`](https://github.com/gregorydulin/cds-wrap/blob/gmd-update-readme/make-cds-wrap-venv)
 
 This will create a folder `cds-wrap-venv` in the current directory
 
-## Create package
+#### Install system-wide (Linux)
+* Clone this repo
+* execute `install` with root privileges (e.g. `sudo install`)
+
+### Create package
 ```
 # linux
 ./cds-wrap-venv/bin/cds-wrap file [file...]
@@ -28,10 +36,13 @@ This will create a folder `cds-wrap-venv` in the current directory
 ./cds-wrap-venv/Scripts/cds-wrap file [file...]
 ```
 
-## Reconstruct files from package
+### Reconstruct files from package
 (i.e. on the other side of the CDS)
 
-Run the file through a quoted-printable decoder (produces .tar file)
-`tar -xf <file>`
-
-TODO: add this functionality natively
+If cds-wrap is unavailable:
+* Run the file through a quoted-printable decoder (produces .tar file)
+  * `cat <cds-wrap package> | perl -MMIME::QuotedPrint=decode_qp -e 'print decode_qp join "",<>' > package.tar`
+* Untar the tar file
+  * `tar -xf package.tar`
+If cds-wrap is available:
+* `cds-wrap --unwrap <cds-wrap package>`

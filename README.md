@@ -44,5 +44,6 @@ If cds-wrap is unavailable:
   * `cat <cds-wrap package> | perl -MMIME::QuotedPrint=decode_qp -e 'print decode_qp join "",<>' > package.tar`
 * Untar the tar file
   * `tar -xf package.tar`
+
 If cds-wrap is available:
 * `cds-wrap --unwrap <cds-wrap package>`

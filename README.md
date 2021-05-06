@@ -101,6 +101,7 @@ For example:
 ```
 cds-wrap somedirectory
 ```
+*The file path needs to use forward slash format ex. C:/Users/...
 
 ### Reconstruct files from package
 (i.e. on the other side of the CDS)

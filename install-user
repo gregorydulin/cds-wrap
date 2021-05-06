@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+
+# http://redsymbol.net/articles/unofficial-bash-strict-mode/
+set -eo pipefail # -u breaks python activate scripts
+
+set -x
+
+# https://stackoverflow.com/a/246128/2895343
+script_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+
+# make venv
+mkdir -p ~/venv
+pushd ~/venv
+  "${script_dir}"/make-cds-wrap-venv
+popd
+
+# use 'bin' for Linux and 'Script' for Windows
+if ( uname -a | grep 'MINGW' ); then
+  bin_name='Scripts'
+else
+  bin_name='bin'
+fi
+
+# make symlink
+mkdir -p ~/bin
+ln -sf ~/venv/cds-wrap-venv/"${bin_name}"/cds-wrap ~/bin/cds-wrap

@@ -8,15 +8,24 @@ set -eo pipefail # -u breaks python activate scripts
 # https://stackoverflow.com/a/246128/2895343
 script_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
+# get python version
+if which python >/dev/null; then
+  python=python
+fi
+if which python3 >/dev/null; then
+  python=python3
+fi
+
 # make venv
-python_version="$(python --version || true)"
+python_version="$(${python} --version || true)"
 if (
   echo "${python_version}" \
     | grep -P 'Python 3'
 ); then
-  python -m venv ./cds-wrap-venv
+  ${python} -m venv ./cds-wrap-venv
 else
-  python3 -m venv ./cds-wrap-venv
+  echo "ERROR:  Python 3 required"
+  exit
 fi
 
 venv_activated=false
